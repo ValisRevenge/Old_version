@@ -10,6 +10,13 @@ import UIKit
 
 class WeatherDayCell: UITableViewCell {
 
+    @IBOutlet weak var weatherImageBox: UIImageView!
+    
+    @IBOutlet weak var temperatureLabel: UILabel!
+    
+    @IBOutlet weak var dayNameLabel: UILabel!
+    
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

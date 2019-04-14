@@ -56,6 +56,11 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="dayNameLabel" destination="m3W-kf-5BQ" id="QP3-dO-HNP"/>
+                <outlet property="temperatureLabel" destination="MED-K7-En7" id="g6Q-51-rC7"/>
+                <outlet property="weatherImageBox" destination="YUF-yI-ON4" id="gHN-Vr-K6s"/>
+            </connections>
             <point key="canvasLocation" x="35.5" y="68"/>
         </tableViewCell>
     </objects>

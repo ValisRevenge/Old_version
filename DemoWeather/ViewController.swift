@@ -10,14 +10,11 @@ import UIKit
 import Alamofire
 import CoreLocation
 
-//current weather  "https://api.openweathermap.org/data/2.5/weather?id=524901&APPID=b5ba9264d3ff44e5c0097c7aeda465a7"
-//current weather  "https://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=b5ba9264d3ff44e5c0097c7aeda465a7"
-
 //
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
-    @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet weak var searchBar: CitiesSearchBar!
     
     @IBOutlet weak var weatherPictureBox: UIImageView!
     
@@ -51,13 +48,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }
         }
     }
-
+    
+    var city:String = "Dnipro" {
+        didSet {
+            loader.getWeatherByCity(city: city, completed: downloadWeather)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
+        
+        searchBar.closure = {city in self.city = city}
     }
 
     override func didReceiveMemoryWarning() {
@@ -86,21 +91,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 break
             case "Clouds":
                 weatherPictureBox.image = #imageLiteral(resourceName: "cloudy")
+                break
+            case "Mist":
+                weatherPictureBox.image = #imageLiteral(resourceName: "mist")
+                break
             default:
-                weatherPictureBox.image = #imageLiteral(resourceName: "rain")
+                weatherPictureBox.image = #imageLiteral(resourceName: "cloudy")
                 break
             }
             
         }
         if let weather = info["main"] as? [String:Any] {
-            temperatureLabel.text = weather["temp"] as? String ?? "0'C"
-            pressureLabel.text = "pressure: " + (weather["pressure"] as? String ?? "???")
-            humidityLabel.text = "humidity: " + (weather["humidity"] as? String ?? "???")
-            windLabel.text = "wind:" +  (weather["wind"] as? String ?? "???")
+            temperatureLabel.text = String(weather["temp"] as? Double ?? 0) + "'C"
+            pressureLabel.text = "pressure: " + (String(weather["pressure"] as? Double ?? 0))
+            humidityLabel.text = "humidity: " + (String(weather["humidity"] as? Double ?? 0)) + " %"
         }
-        if let sysInfo = info["sys"] as? [String:Any] {
-            cityLabel.text = sysInfo["name"] as? String ?? "???"
+        if let sysInfo = info["name"] as? String {
+            cityLabel.text = sysInfo
         }
+        let wind = info["wind"] as! [String:Any]
+        windLabel.text = "wind: " +  String((wind["speed"] as? Double ?? 0)) + " m/s, deg: " + String(wind["deg"] as? Double ?? 0)
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
