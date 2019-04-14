@@ -27,9 +27,15 @@ class DataLoader: NSObject {
         downloadInfo(url: url, completed: completed)
     }
     
-    func getForecastByCity(coordinate: CLLocation, completed:@escaping (_ dictionary:[String:Any])->Void) {
+    func getForecastByCoordinate(coordinate: CLLocation, completed:@escaping (_ dictionary:[String:Any])->Void) {
+        
         var url:String = forecastUrl.replacingOccurrences(of: "{lat}", with: coordinate.coordinate.latitude.description)
         url = url.replacingOccurrences(of: "{lon}", with: coordinate.coordinate.longitude.description)
+        downloadInfo(url: url, completed: completed)
+    }
+    
+    func getForecastByCity(city:String, completed:@escaping (_ dictionary:[String:Any])->Void) {
+        var url = forecastUrl.replacingOccurrences(of: "lat={lat}&lon={lon}", with: "q="+city)
         downloadInfo(url: url, completed: completed)
     }
     

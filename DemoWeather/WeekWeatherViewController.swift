@@ -31,7 +31,7 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
         
         list = forecastDictionary?["list"] as? [[String:Any]]
         if let _ = list?.count {
-            tableSectionsCount = list!.count - 1
+            tableSectionsCount = (list!.count - 1) / 6
         }
         // Do any additional setup after loading the view.
     }
@@ -54,7 +54,7 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let row = indexPath.row
+        let row = indexPath.row * 6
         if let list = self.list {
             let cell = tableView.dequeueReusableCell(withIdentifier: "dayCell", for: indexPath) as! WeatherDayCell
             if let weather = list[row]["weather"] as? [[String:Any]] {
@@ -77,6 +77,10 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
                     break
                 }
                 
+                if let weather = list[row]["main"] as? [String:Any] {
+                    cell.temperatureLabel.text = String(weather["temp"] as? Double ?? 0) + "'C"
+                }
+                //cell.dayNameLabel.text = DateComponents
             }
             
             return cell

@@ -44,7 +44,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         didSet {
             if let point = location {
                 loader.getWeatherByCoordinate(coordinate: point, completed: downloadWeather)
-                loader.getForecastByCity(coordinate: point, completed: downloadForecast)
+                loader.getForecastByCoordinate(coordinate: point, completed: downloadForecast)
             }
         }
     }
@@ -52,6 +52,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var city:String = "Dnipro" {
         didSet {
             loader.getWeatherByCity(city: city, completed: downloadWeather)
+            loader.getForecastByCity(city: city, completed: downloadForecast)
         }
     }
     
