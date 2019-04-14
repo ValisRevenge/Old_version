@@ -10,54 +10,40 @@ import UIKit
 import Alamofire
 import CoreLocation
 
+//current weather  "https://api.openweathermap.org/data/2.5/weather?id=524901&APPID=b5ba9264d3ff44e5c0097c7aeda465a7"
+//current weather  "https://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=b5ba9264d3ff44e5c0097c7aeda465a7"
+
+//
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
-    let serverUrl = "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID={APIKEY}"
-    // token - b5ba9264d3ff44e5c0097c7aeda465a7
-
+    @IBOutlet weak var weatherPictureBox: UIImageView!
+    
+    @IBOutlet weak var temperatureLabel: UILabel!
+    
+    @IBOutlet weak var windLabel: UILabel!
+    
+    @IBOutlet weak var pressureLabel: UILabel!
+    
+    @IBOutlet weak var humidityLabel: UILabel!
+    
     var locationManager: CLLocationManager!
+    
+    var loader:DataLoader = DataLoader()
+    
+    var location:CLLocation? {
+        didSet {
+            if let point = location {
+                loader.getWeatherByCoordinate(coordinate: point)
+            }
+        }
+    }
 
-    @IBOutlet weak var imageView: UIImageView!
-    
-    @IBOutlet weak var progressBar: UIProgressView!
-    
-    @IBOutlet weak var loadProgressLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        //        request("http://jsonplaceholder.typicode.com/posts", method:.get).validate().responseData {
-        //        //request("https://www.youtube.com/watch?v=ymqD89J1ZHg", method:.get).validate().responseJSON {
-        //
-        //            responce in
-        //            switch responce.result {
-        //            case .success(let value):
-        //                guard let string = String(data: value, encoding: .utf8) else {return}
-        //                print("line: ","\(self.i)"," ---\n", string)
-        //                break
-        //            default:
-        //                break
-        //            }
-        //            self.i += 1
-        //        }
-        
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
-        
-        request("https://www.universetoday.com/wp-content/uploads/2014/12/201103_VirgoGCM_andreo.jpg").validate().downloadProgress {
-            progress in
-            self.progressBar.observedProgress = progress
-            self.loadProgressLabel.text = progress.localizedDescription ?? "0%"
-            }
-            .response { responce in
-                guard let data = responce.data, let image = UIImage(data:data) else {return}
-                self.imageView.image = image
-                
-                print("success!")
-        }
-        print("view did load ended")
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -77,7 +63,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = manager.location?.coordinate else {return}
-        print(location)
+        loader.getWeatherByCoordinate(coordinate: manager.location!)
+        //print(location)
     }
 
 
