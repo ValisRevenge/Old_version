@@ -16,6 +16,9 @@ import CoreLocation
 //
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
+    
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     @IBOutlet weak var weatherPictureBox: UIImageView!
     
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -26,14 +29,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var humidityLabel: UILabel!
     
+    @IBOutlet weak var cityLabel: UILabel!
+    
+    
     var locationManager: CLLocationManager!
     
     var loader:DataLoader = DataLoader()
     
+    var weatherDictionary:[String:Any]? {
+        didSet {
+            readData(dictionary: weatherDictionary)
+        }
+    }
+    var forecastDictionary:[String:Any]?
+    
     var location:CLLocation? {
         didSet {
             if let point = location {
-                loader.getWeatherByCoordinate(coordinate: point)
+                loader.getWeatherByCoordinate(coordinate: point, completed: downloadWeather)
+                loader.getForecastByCity(coordinate: point, completed: downloadForecast)
             }
         }
     }
@@ -51,6 +65,44 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    @objc func downloadWeather(dictionary:[String:Any]) {
+        weatherDictionary = dictionary
+    }
+    
+    @objc func downloadForecast(dictionary:[String:Any]) {
+        forecastDictionary = dictionary
+    }
+    
+    func readData(dictionary:[String:Any]?) {
+        guard let info = dictionary else {return}
+        if let weather = info["weather"] as? [[String:Any]] {
+            let imageType = weather[0]["main"] as! String
+            switch imageType {
+            case "Clear":
+                weatherPictureBox.image = #imageLiteral(resourceName: "bright_sunny")
+                break
+            case "Snow":
+                weatherPictureBox.image = #imageLiteral(resourceName: "snow")
+                break
+            case "Clouds":
+                weatherPictureBox.image = #imageLiteral(resourceName: "cloudy")
+            default:
+                weatherPictureBox.image = #imageLiteral(resourceName: "rain")
+                break
+            }
+            
+        }
+        if let weather = info["main"] as? [String:Any] {
+            temperatureLabel.text = weather["temp"] as? String ?? "0'C"
+            pressureLabel.text = "pressure: " + (weather["pressure"] as? String ?? "???")
+            humidityLabel.text = "humidity: " + (weather["humidity"] as? String ?? "???")
+            windLabel.text = "wind:" +  (weather["wind"] as? String ?? "???")
+        }
+        if let sysInfo = info["sys"] as? [String:Any] {
+            cityLabel.text = sysInfo["name"] as? String ?? "???"
+        }
+    }
+    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways {
             if CLLocationManager.isMonitoringAvailable(for: CLBeaconRegion.self) {
@@ -63,10 +115,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = manager.location?.coordinate else {return}
-        loader.getWeatherByCoordinate(coordinate: manager.location!)
+        self.location = manager.location
         //print(location)
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "forecastSegue" {
+            let dc = segue.destination as! UINavigationController
+            let vc = dc.topViewController! as! WeekWeatherViewController
+            vc.forecastDictionary = forecastDictionary
+        }
+    }
 
 }
 
