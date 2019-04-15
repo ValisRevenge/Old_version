@@ -96,6 +96,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             case "Mist":
                 weatherPictureBox.image = #imageLiteral(resourceName: "mist")
                 break
+            case "Rain":
+                weatherPictureBox.image = #imageLiteral(resourceName: "rain")
+                break
             default:
                 weatherPictureBox.image = #imageLiteral(resourceName: "cloudy")
                 break

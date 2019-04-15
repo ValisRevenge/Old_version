@@ -86,6 +86,9 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
                 case "Mist":
                     cell.weatherImageBox.image = #imageLiteral(resourceName: "mist")
                     break
+                case "Rain":
+                    cell.weatherImageBox.image = #imageLiteral(resourceName: "rain")
+                    break
                 default:
                     cell.weatherImageBox.image = #imageLiteral(resourceName: "cloudy")
                     break
