@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
@@ -15,6 +16,10 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
     var tableSectionsCount = 0
     
     var list:[[String:Any]]?
+    
+    var temperatureArray:[Double] = []
+    
+    var date = Date()
 
     @IBOutlet weak var navigationTitle: UINavigationItem!
     
@@ -33,6 +38,15 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
         if let _ = list?.count {
             tableSectionsCount = (list!.count - 1) / 6
         }
+        
+        if let list = self.list {
+            for item in list {
+                if let weather = item["main"] as? [String:Any] {
+                    temperatureArray.append(weather["temp"] as? Double ?? 0.0)
+                }
+            }
+        }
+        
         // Do any additional setup after loading the view.
     }
     
@@ -76,11 +90,15 @@ class WeekWeatherViewController: UIViewController, UITableViewDataSource, UITabl
                     cell.weatherImageBox.image = #imageLiteral(resourceName: "cloudy")
                     break
                 }
-                
-                if let weather = list[row]["main"] as? [String:Any] {
-                    cell.temperatureLabel.text = String(weather["temp"] as? Double ?? 0) + "'C"
+                let tempIndex = temperatureArray[row...row+6]
+                cell.temperatureLabel.text = String(tempIndex.max()!) + "'C"
+                // get day
+                var index = row/6 + Calendar.current.firstWeekday
+                if index > 6 {
+                    index = index - 7
                 }
-                //cell.dayNameLabel.text = DateComponents
+                print(Calendar.current.weekdaySymbols)
+                cell.dayNameLabel.text = Calendar.current.weekdaySymbols[index]
             }
             
             return cell
